@@ -1,4 +1,4 @@
-const { sql } = require("graphql-tag");
+const { gql } = require("graphql-tag");
 
 const typeDefs = gql`
     type Query {
