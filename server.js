@@ -1,32 +1,31 @@
-const express = require("express");
 const { ApolloServer } = require("@apollo/server");
-const { expressMiddleware } = require("@apollo/server/express4");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+const { startStandaloneServer } = require("@apollo/server/standalone");
 
-const typeDefs = require("./schemma");
-const resolvers = require("./resolvers");
+// GraphQL schema
+const typeDefs = `#graphql
+  type Query {
+    hello: String
+  }
+`;
+
+// Resolver
+const resolvers = {
+  Query: {
+    hello: () => "Hello Christian, welcome to GraphQL!"
+  }
+};
 
 async function startServer() {
-    const app = express();
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers
+  });
 
-    const server = new ApolloServer({
-        typeDefs,
-        resolvers,
-    });
+  const { url } = await startStandaloneServer(server, {
+    listen: { port: 4000 }
+  });
 
-    await server.start();
-
-    app.use(
-        "/graphql",
-        cors(),
-        bodyParser.json(),
-        expressMiddleware(server)
-    );
-
-    app.listen(4000, () => {
-        console.log("Server running on http://localhost:4000/graphql");
-    });
+  console.log(`🚀 Server ready at ${url}`);
 }
 
 startServer();
